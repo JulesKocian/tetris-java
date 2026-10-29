@@ -77,6 +77,7 @@ Choisis une difficulté en cliquant sur son bouton ou avec les touches 1, 2 ou 3
 ## Score
 
 - 1 ligne : 100, 2 lignes : 300, 3 lignes : 500, 4 lignes (Tetris) : 800, multiplié par le niveau
+- Le message « TETRIS » s'affiche brièvement avec la police fournie après l'effacement de 4 lignes d'un coup
 - Descente rapide : +1 par case, chute directe : +2 par case
 - Un niveau toutes les 5 lignes, la vitesse augmente à chaque niveau
 - Le message « Level Up » s'affiche brièvement avec la police fournie dans `megamax-jonathan-too-font/`

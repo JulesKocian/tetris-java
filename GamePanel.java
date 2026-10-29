@@ -79,6 +79,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean gameOver;
     private boolean showingMenu = true;
     private long levelUpUntil;
+    private long tetrisUntil;
     private Difficulty selectedDifficulty = Difficulty.EASY;
 
     /** Prépare la grille, les commandes clavier et les éléments du menu. */
@@ -159,6 +160,8 @@ public class GamePanel extends JPanel implements ActionListener {
         holdUsed = false;
         paused = false;
         gameOver = false;
+        levelUpUntil = 0;
+        tetrisUntil = 0;
         next = new Piece(nextType());
         spawnPiece();
         timer.setDelay(score.getDelay());
@@ -281,6 +284,9 @@ public class GamePanel extends JPanel implements ActionListener {
         if (cleared > 0) {
             sounds.playLineClear();
         }
+        if (cleared == 4) {
+            tetrisUntil = System.currentTimeMillis() + LEVEL_UP_DISPLAY_MS;
+        }
         int previousLevel = score.getLevel();
         score.addLines(cleared);
         if (score.getLevel() > previousLevel) {
@@ -394,6 +400,7 @@ public class GamePanel extends JPanel implements ActionListener {
         drawCurrentPiece(g2);
         drawSidePanel(g2);
         drawLevelUp(g2);
+        drawTetris(g2);
 
         if (gameOver) {
             drawOverlay(g2, "GAME OVER", "R pour rejouer");
@@ -608,12 +615,32 @@ public class GamePanel extends JPanel implements ActionListener {
 
     /** Affiche brièvement le message lorsqu'un nouveau niveau est atteint. */
     private void drawLevelUp(Graphics2D g2) {
-        if (System.currentTimeMillis() >= levelUpUntil) {
+        long now = System.currentTimeMillis();
+        if (now >= levelUpUntil || now < tetrisUntil) {
             return;
         }
 
         String message = "Level Up";
         g2.setFont(levelUpFont.deriveFont(Font.BOLD, 48f));
+        FontMetrics metrics = g2.getFontMetrics();
+        int x = (BOARD_W - metrics.stringWidth(message)) / 2;
+        int y = BOARD_H / 2;
+
+        g2.setColor(new Color(0, 0, 0, 190));
+        g2.fillRoundRect(x - 20, y - metrics.getAscent() - 10,
+                metrics.stringWidth(message) + 40, metrics.getHeight() + 20, 20, 20);
+        g2.setColor(new Color(255, 220, 65));
+        g2.drawString(message, x, y);
+    }
+
+    /** Affiche brièvement le message TETRIS après l'effacement de quatre lignes. */
+    private void drawTetris(Graphics2D g2) {
+        if (System.currentTimeMillis() >= tetrisUntil) {
+            return;
+        }
+
+        String message = "TETRIS";
+        g2.setFont(levelUpFont.deriveFont(Font.BOLD, 56f));
         FontMetrics metrics = g2.getFontMetrics();
         int x = (BOARD_W - metrics.stringWidth(message)) / 2;
         int y = BOARD_H / 2;
